@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<meta name="theme-color" content="#0d1117"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="Souhill"/>
+<link rel="manifest" href="./manifest.json"/>
+<link rel="apple-touch-icon" href="./icons/icon-192.png"/>
+<title>Souhill</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--gold:#c9a84c;--gold2:#e8c96a;--gdim:rgba(201,168,76,0.12);--text:#e6edf3;--muted:#8b949e;--border:#30363d;--green:#3fb950;--blue:#58a6ff;--r:14px;--st:env(safe-area-inset-top,0px);--sb:env(safe-area-inset-bottom,0px)}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overscroll-behavior:none;-webkit-tap-highlight-color:transparent;font-size:15px}
+#splash{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity 0.4s ease}
+#splash.gone{opacity:0;pointer-events:none}
+.slogo{font-size:48px;font-weight:900;color:var(--gold);letter-spacing:3px}
+.ssub{font-size:12px;color:var(--muted);letter-spacing:4px;margin-top:8px;text-transform:uppercase}
+#app{display:flex;flex-direction:column;height:100svh}
+#home{flex:1;overflow-y:auto;padding:calc(24px + var(--st)) 20px calc(100px + var(--sb))}
+.greet{font-size:12px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.aname{font-size:34px;font-weight:900;color:var(--gold);margin-bottom:28px}
+.mgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.mc{background:var(--bg2);border:1px solid var(--border);border-radius:20px;padding:24px 18px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.12s}
+.mc:active{transform:scale(0.96)}
+.mc.full{grid-column:1/-1}
+.mc-ic{font-size:30px;margin-bottom:10px}
+.mc-t{font-size:17px;font-weight:700;color:var(--text);margin-bottom:3px}
+.mc-s{font-size:12px;color:var(--muted)}
+.mc-b{position:absolute;top:12px;right:12px;background:var(--gold);color:#0d1117;font-size:10px;font-weight:700;padding:3px 8px;border-radius:20px}
+.page{display:none;flex:1;flex-direction:column;overflow:hidden}
+.page.on{display:flex}
+.ph{display:flex;align-items:center;gap:12px;padding:calc(14px + var(--st)) 20px 14px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0}
+.bk{background:var(--bg2);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text);flex-shrink:0}
+.ptit{font-size:19px;font-weight:800;color:var(--gold)}
+.pc{flex:1;overflow-y:auto;padding:16px 16px calc(80px + var(--sb))}
+.tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:4px;margin-bottom:16px;flex-shrink:0}
+.tab{flex:1;padding:9px;text-align:center;border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;color:var(--muted);transition:all 0.2s}
+.tab.on{background:var(--gold);color:#0d1117}
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.stit{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:0.1em;text-transform:uppercase;margin:18px 0 8px}
+.pbar-bg{background:var(--bg3);border-radius:100px;height:12px;overflow:hidden;margin:12px 0 10px}
+.pbar{height:100%;border-radius:100px;background:linear-gradient(90deg,var(--gold),var(--gold2));transition:width 0.8s cubic-bezier(.34,1.56,.64,1)}
+.pstats{display:flex;gap:8px;flex-wrap:wrap}
+.psi{text-align:center;flex:1;min-width:50px}
+.psn{font-size:20px;font-weight:800;color:var(--gold)}
+.psl{font-size:10px;color:var(--muted);margin-top:2px}
+.wbtn{width:100%;padding:13px;background:var(--gold);border:none;border-radius:12px;color:#0d1117;font-size:14px;font-weight:700;cursor:pointer;margin-top:12px}
+.wbtn.out{background:transparent;border:1px solid var(--gold);color:var(--gold)}
+.wrow{display:none;gap:8px;margin-top:10px}
+.wrow.on{display:flex}
+.win{flex:1;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:16px;outline:none;font-family:inherit}
+.win:focus{border-color:var(--gold)}
+.wok{padding:12px 18px;background:var(--gold);border:none;border-radius:10px;color:#0d1117;font-weight:700;cursor:pointer;font-size:14px}
+.pgrid{display:flex;flex-wrap:nowrap;flex-direction:row;gap:14px;overflow-x:scroll;overflow-y:hidden;padding-bottom:8px;-webkit-overflow-scrolling:touch;touch-action:pan-x}
+.pgrid::-webkit-scrollbar{height:3px}
+.pgrid::-webkit-scrollbar-thumb{background:var(--gold);border-radius:4px}
+.pweek{flex-shrink:0;width:100%}
+.pweek-lbl{font-size:11px;font-weight:700;color:var(--gold);letter-spacing:0.05em;text-transform:uppercase;margin-bottom:8px}
+.pweek-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.pslot{aspect-ratio:2/3;background:var(--bg3);border:1px dashed var(--border);border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer}
+.pslot img{width:100%;height:100%;object-fit:cover}
+.plbl{position:absolute;bottom:0;left:0;right:0;background:rgba(13,17,23,0.88);font-size:9px;color:var(--text);padding:4px 6px;text-align:center;line-height:1.4}
+.pwk{font-size:9px;color:var(--gold);font-weight:700;display:block}
+.padd{font-size:22px;opacity:0.35}
+.pals{font-size:9px;color:var(--muted);margin-top:3px}
+.pdel{position:absolute;top:5px;right:5px;background:rgba(13,17,23,0.85);color:#fff;font-size:11px;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:2}
+.jour-btn{flex:1;padding:9px 4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;min-width:60px}
+.jour-btn.on{background:var(--gold);color:#0d1117;border-color:var(--gold)}
+.jour-block{}
+.sem-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:12px}
+.sem-tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all 0.2s}
+.sem-tab.on{background:var(--bg3);color:var(--text)}
+.ex-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.ex-top{display:flex;align-items:center;gap:10px;margin-bottom:0}
+.ex-card:not(.no-weight) .ex-top{margin-bottom:10px}
+.ex-ic{font-size:20px;flex-shrink:0}
+.ex-name{font-size:14px;font-weight:700;color:var(--text)}
+.ex-sets{font-size:12px;color:var(--gold);font-weight:600;margin-top:2px}
+.ex-weight{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
+.ex-weight:focus{border-color:var(--gold)}
+.jour-btn{flex:1;padding:9px 4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;min-width:60px}
+.jour-btn.on{background:var(--gold);color:#0d1117;border-color:var(--gold)}
+.sem-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:12px}
+.sem-tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all 0.2s}
+.sem-tab.on{background:var(--bg3);color:var(--text)}
+.ex-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.ex-top{display:flex;align-items:center;gap:10px}
+.ex-card:not(.no-weight) .ex-top{margin-bottom:10px}
+.ex-ic{font-size:20px;flex-shrink:0}
+.ex-name{font-size:14px;font-weight:700;color:var(--text)}
+.ex-sets{font-size:12px;color:var(--gold);font-weight:600;margin-top:2px}
+.ex-weight{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
+.ex-weight:focus{border-color:var(--gold)}
+.jour-btn{flex:1;padding:9px 4px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;text-align:center;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;min-width:60px}
+.jour-btn.on{background:var(--gold);color:#0d1117;border-color:var(--gold)}
+.sem-tabs{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:3px;margin-bottom:12px}
+.sem-tab{flex:1;padding:8px;text-align:center;border-radius:8px;cursor:pointer;font-size:12px;font-weight:600;color:var(--muted);transition:all 0.2s}
+.sem-tab.on{background:var(--bg3);color:var(--text)}
+.ex-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:12px 14px;margin-bottom:8px}
+.ex-top{display:flex;align-items:center;gap:10px}
+.ex-card:not(.no-weight) .ex-top{margin-bottom:10px}
+.ex-ic{font-size:20px;flex-shrink:0}
+.ex-name{font-size:14px;font-weight:700;color:var(--text)}
+.ex-sets{font-size:12px;color:var(--gold);font-weight:600;margin-top:2px}
+.ex-weight{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:14px;outline:none;font-family:inherit}
+.ex-weight:focus{border-color:var(--gold)}
+.supp-btn{flex:1;padding:12px 6px;background:var(--bg3);border:2px solid var(--border);border-radius:12px;text-align:center;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all 0.2s;user-select:none;-webkit-user-select:none}
+.supp-btn.done{background:rgba(201,168,76,0.12);border-color:var(--gold);color:var(--gold)}
+.pzoom{position:fixed;inset:0;background:rgba(0,0,0,0.95);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.pzoom img{max-width:100%;max-height:80vh;border-radius:12px;object-fit:contain}
+.pzoom-lbl{color:var(--muted);font-size:12px;margin-top:12px}
+.pzoom-close{position:absolute;top:calc(14px + var(--st));right:16px;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-size:20px;width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+.smc{background:var(--bg2);border:1px solid var(--gold);border-radius:var(--r);padding:16px;margin-bottom:14px}
+.smtit{font-size:14px;font-weight:700;color:var(--gold);margin-bottom:10px}
+.irow{display:flex;justify-content:space-between;align-items:center;background:var(--bg3);border-radius:8px;padding:8px 12px;margin-bottom:6px}
+.inn{font-size:13px;font-weight:500}
+.idd{font-size:12px;color:var(--muted)}
+.stot{display:flex;justify-content:space-between;align-items:center;padding-top:10px;border-top:1px solid var(--border);margin-top:4px}
+.stl{font-size:13px;font-weight:600;color:var(--muted)}
+.stv{font-size:20px;font-weight:800;color:var(--gold)}
+.crw{display:flex;align-items:center;gap:18px;margin-bottom:14px}
+.cring{position:relative;width:88px;height:88px;flex-shrink:0}
+.cring svg{transform:rotate(-90deg)}
+.crc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.cnum{font-size:16px;font-weight:800;color:var(--gold);line-height:1}
+.clbl{font-size:9px;color:var(--muted);margin-top:2px}
+.cinfo{flex:1}
+.ctit{font-size:15px;font-weight:700;margin-bottom:4px}
+.csub{font-size:12px;color:var(--muted);line-height:1.6}
+.cfl{display:flex;flex-direction:column;gap:7px;margin-bottom:10px}
+.cfi{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border-radius:9px;padding:9px 12px}
+.cfn{font-size:13px;font-weight:500}
+.cfc{font-size:12px;color:var(--gold);display:flex;align-items:center;gap:8px}
+.cfd{cursor:pointer;color:var(--muted);font-size:15px;padding:2px 6px}
+.cacts{display:flex;gap:8px}
+.btn-af{flex:1;padding:11px;background:var(--gdim);border:1px dashed var(--gold);border-radius:10px;color:var(--gold);font-size:13px;font-weight:700;cursor:pointer;text-align:center}
+
+
+.dcard{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:8px}
+.dtxt{font-size:14px;line-height:1.7;margin-bottom:8px;white-space:pre-wrap}
+.dmeta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ddate{font-size:11px;color:var(--muted)}
+.dreal{font-size:11px;background:var(--green);color:#0d1117;padding:2px 8px;border-radius:20px;font-weight:700}
+.btn-rl{font-size:11px;background:var(--gdim);color:var(--gold);border:1px solid var(--gold);padding:3px 10px;border-radius:20px;cursor:pointer;font-weight:700}
+.darea{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:14px}
+.dta{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px;color:var(--text);font-size:14px;line-height:1.7;resize:none;outline:none;min-height:90px;font-family:inherit}
+.dta:focus{border-color:var(--gold)}
+.ip{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;text-align:center;gap:10px}
+.ip-ic{font-size:44px;opacity:0.5}
+.ip-t{font-size:18px;font-weight:800;color:var(--gold)}
+.ip-s{font-size:13px;color:var(--muted);line-height:1.6;max-width:240px}
+#bnav{display:none;flex-shrink:0;background:var(--bg2);border-top:1px solid var(--border);padding:6px 0 calc(6px + var(--sb))}
+#bnav.on{display:flex}
+.ni{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;cursor:pointer;padding:6px;color:var(--muted);transition:color 0.2s}
+.ni.active{color:var(--gold)}
+.ni-i{font-size:20px}
+.ni-l{font-size:10px;font-weight:700}
+.mo{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:100;align-items:flex-end;justify-content:center}
+.mo.on{display:flex}
+.modal{background:var(--bg2);border-radius:20px 20px 0 0;padding:22px 18px calc(22px + var(--sb));width:100%;max-width:480px;animation:sU 0.22s ease;max-height:88vh;overflow-y:auto}
+@keyframes sU{from{transform:translateY(28px);opacity:0}to{transform:none;opacity:1}}
+.mt{font-size:17px;font-weight:800;color:var(--gold);margin-bottom:14px}
+.mi{width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:16px;outline:none;margin-bottom:10px;font-family:inherit}
+.mi:focus{border-color:var(--gold)}
+.mr{display:flex;gap:8px}
+.btn-mc{flex:1;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:10px;color:var(--muted);font-size:14px;font-weight:600;cursor:pointer}
+.btn-mo{flex:2;padding:12px;background:var(--gold);border:none;border-radius:10px;color:#0d1117;font-size:14px;font-weight:700;cursor:pointer}
+#toast{position:fixed;bottom:calc(88px + var(--sb));left:50%;transform:translateX(-50%) translateY(8px);background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:10px 20px;border-radius:100px;font-size:13px;opacity:0;transition:opacity 0.2s,transform 0.2s;z-index:300;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+
+.learn-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:4px}
+.learn-item{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:10px 12px;cursor:pointer;display:flex;align-items:center;gap:10px;transition:all 0.2s;-webkit-tap-highlight-color:transparent}
+.learn-item.done{background:rgba(201,168,76,0.1);border-color:var(--gold)}
+.li-check{width:22px;height:22px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:11px;color:transparent;flex-shrink:0;transition:all 0.2s}
+.learn-item.done .li-check{background:var(--gold);border-color:var(--gold);color:#0d1117}
+.li-body{min-width:0}
+.li-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.2}
+.li-sub{font-size:10px;color:var(--muted);margin-top:2px}
+#ibn-grid .learn-item{grid-column:1/-1;display:flex}
+#ibn-grid{display:grid;grid-template-columns:1fr;gap:8px}
+
+.accord-hd{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:border-color 0.2s;-webkit-tap-highlight-color:transparent}
+.accord-hd:active{opacity:0.8}
+.accord-hd.open{border-color:var(--gold);border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom:none}
+.accord-arrow{color:var(--gold);font-size:14px;transition:transform 0.25s;flex-shrink:0}
+.accord-arrow.open{transform:rotate(90deg)}
+.accord-body{display:none;background:var(--bg2);border:1px solid var(--gold);border-top:none;border-bottom-left-radius:16px;border-bottom-right-radius:16px;padding:12px;margin-bottom:12px}
+.accord-body.open{display:block}
+
+.dhikr-ideas{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.dhikr-idea{background:var(--bg3);border-radius:12px;padding:10px 12px;text-align:center;font-size:16px;font-weight:700;color:var(--gold);font-family:serif;line-height:1.4}
+.dhikr-idea span{display:block;font-size:10px;color:var(--muted);font-family:-apple-system,sans-serif;font-weight:600;margin-top:4px}
+
+.prayer-row{display:flex;align-items:center;gap:14px;padding:13px 0;border-bottom:1px solid var(--border)}
+.prayer-row:last-child{border-bottom:none}
+.prayer-past{opacity:0.4}
+</style>
+</head>
+<body>
+<div id="splash"><div class="slogo">Souhill</div><div class="ssub">Mon espace personnel</div></div>
+<div id="app">
+<div id="home">
+  <div class="greet">Bienvenue</div>
+  <div class="aname">Souhill</div>
+
+  <div class="mgrid">
+    <div class="mc" onclick="goPage('sport')"><div class="mc-ic">&#x1F4AA;</div><div class="mc-t">Sport</div><div class="mc-s">Alimentation &amp; pratique</div></div>
+    <div class="mc" onclick="goPage('religion')"><div class="mc-ic">&#x1F319;</div><div class="mc-t">Religion</div><div class="mc-s">Dhikr &amp; Duaa</div></div>
+    <div class="mc full" onclick="goPage('projet')"><div class="mc-ic">&#x1F680;</div><div class="mc-t">Projets</div><div class="mc-s">Avancement &amp; objectifs</div><div class="mc-b">In process</div></div>
+  </div>
+</div>
+<div class="page" id="page-sport">
+  <div class="ph"><button class="bk" onclick="goHome()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><div class="ptit">&#x1F4AA; Sport</div></div>
+  <div style="padding:10px 16px 0;flex-shrink:0"><div class="tabs"><div class="tab on" onclick="stab('alim',this)">&#x1F957; Alimentation</div><div class="tab" onclick="stab('pratique',this)">&#x1F3CB; Pratique</div></div></div>
+  <div class="pc" id="sp-alim">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px"><div style="font-size:15px;font-weight:800">&#x2696;&#xFE0F; Progression poids</div><div style="font-size:12px;color:var(--muted)" id="p-lbl">60 &#x2192; 70 kg</div></div>
+      <div class="pbar-bg"><div class="pbar" id="p-bar" style="width:0%"></div></div>
+      <div class="pstats">
+        <div class="psi"><div class="psn" id="p-act">60</div><div class="psl">kg actuels</div></div>
+        <div class="psi"><div class="psn" id="p-rest">10</div><div class="psl">kg restants</div></div>
+        <div class="psi"><div class="psn">70</div><div class="psl">objectif</div></div>
+        <div class="psi"><div class="psn" id="p-pct">0%</div><div class="psl">accompli</div></div>
+      </div>
+      <div class="wrow" id="wrow"><input class="win" type="number" id="new-w" placeholder="Ex: 61.5" step="0.1" min="40" max="200"/><button class="wok" onclick="saveW()">OK</button></div>
+      <button class="wbtn" id="wbtn" onclick="toggleW()">&#x1F4C5; Mettre &#xE0; jour mon poids</button>
+    </div>
+    <div class="stit">&#x1F4F8; Evolution physique</div>
+    <div class="card" style="padding:14px">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:10px" id="photo-count">Aucune photo — ajoutes-en une !</div>
+      <div style="margin:0 -14px"><div id="pgrid" style="padding:0 14px"></div></div>
+      <div style="display:flex;gap:8px;margin-top:10px">
+        <button class="wbtn out" style="margin-top:0;font-size:13px" onclick="triggerFace()">&#x1F4F7; Face</button>
+        <button class="wbtn out" style="margin-top:0;font-size:13px" onclick="triggerDos()">&#x1F4F7; Dos</button>
+      </div>
+      <input type="file" id="ph-face" accept="image/*" style="display:none" onchange="addPhotoTyped(event,'face')"/>
+      <input type="file" id="ph-dos" accept="image/*" style="display:none" onchange="addPhotoTyped(event,'dos')"/>
+    </div>
+    <div class="stit">&#x1F964; Smoothie prise de masse</div>
+    <div class="smc">
+      <div class="smtit">&#x1F964; Smoothie quotidien &#x2014; recette</div>
+      <div class="irow"><span class="inn">&#x1F95B; Lait entier</span><span class="idd">400ml &#x2248; 412g &middot; 248 kcal</span></div>
+      <div class="irow"><span class="inn">&#x1F33E; Flocons d'avoine</span><span class="idd">100g &middot; 370 kcal</span></div>
+      <div class="irow"><span class="inn">&#x1F34C; Banane</span><span class="idd">~120g &middot; 107 kcal</span></div>
+      <div class="irow"><span class="inn">&#x1F95C; Beurre de cacahu&#xE8;te</span><span class="idd">40g &middot; 235 kcal</span></div>
+      <div class="irow"><span class="inn">&#x1F4AA; Whey (1 scoop)</span><span class="idd">~30g &middot; ~120 kcal</span></div>
+      <div class="stot"><span class="stl">Total estim&#xE9;</span><span class="stv">~1 080 kcal</span></div>
+      <button class="wbtn" style="margin-top:12px" onclick="addSmoo()">+ Ajouter &#xE0; mes calories du jour</button>
+    </div>
+    <div class="stit">&#x1F525; Calories du jour</div>
+    <div class="card">
+      <div class="crw">
+        <div class="cring"><svg width="88" height="88" viewBox="0 0 88 88"><circle cx="44" cy="44" r="36" fill="none" stroke="#1c2128" stroke-width="10"/><circle id="cal-arc" cx="44" cy="44" r="36" fill="none" stroke="#c9a84c" stroke-width="10" stroke-dasharray="226" stroke-dashoffset="226" stroke-linecap="round"/></svg><div class="crc"><div class="cnum" id="c-tot">0</div><div class="clbl">kcal</div></div></div>
+        <div class="cinfo"><div class="ctit">Objectif : 3 500 kcal</div><div class="csub">Consomm&#xE9; : <strong style="color:var(--gold)" id="c-tot2">0</strong> kcal<br/>Restant : <span id="c-rest">3500</span> kcal</div></div>
+      </div>
+      <div class="cfl" id="cfl"></div>
+      <div class="cacts"><div class="btn-af" style="flex:1" onclick="openFM()">&#x270F;&#xFE0F; Saisir un repas</div></div>
+    </div>
+    <div class="stit">&#x1F48A; Complements alimentaires</div>
+    <div class="card">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:14px">
+        <div style="position:relative;width:80px;height:80px;flex-shrink:0">
+          <svg width="80" height="80" viewBox="0 0 80 80">
+            <circle cx="40" cy="40" r="32" fill="none" stroke="#1c2128" stroke-width="9"/>
+            <circle id="supp-arc" cx="40" cy="40" r="32" fill="none" stroke="#c9a84c" stroke-width="9"
+              stroke-dasharray="201" stroke-dashoffset="201" stroke-linecap="round"
+              transform="rotate(-90 40 40)"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center">
+            <div style="font-size:15px;font-weight:800;color:var(--gold);line-height:1" id="supp-num">0</div>
+            <div style="font-size:9px;color:var(--muted)">/ 3</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:15px;font-weight:700;margin-bottom:4px">Objectif : 3 prises</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6">Matin &middot; Midi &middot; Soir</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="supp-btn" id="sb-matin" onclick="toggleSupp('matin')">&#x1F305; Matin</div>
+        <div class="supp-btn" id="sb-midi" onclick="toggleSupp('midi')">&#x2600;&#xFE0F; Midi</div>
+        <div class="supp-btn" id="sb-soir" onclick="toggleSupp('soir')">&#x1F319; Soir</div>
+      </div>
+    </div>
+    </div>
+  <div class="pc" id="sp-pratique" style="display:none">
+
+  <!-- Semaine A/B -->
+  <div class="sem-tabs" style="margin-bottom:14px">
+    <div class="sem-tab on" onclick="selectSemProg(1,this)">Semaine A</div>
+    <div class="sem-tab" onclick="selectSemProg(2,this)">Semaine B</div>
+  </div>
+
+  <!-- SEMAINE A -->
+  <div id="prog-s1">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="jour-btn on" onclick="selectJour(1,'s1',this)">Lundi</div>
+      <div class="jour-btn" onclick="selectJour(2,'s1',this)">Mardi</div>
+      <div class="jour-btn" onclick="selectJour(3,'s1',this)">Jeudi</div>
+      <div class="jour-btn" onclick="selectJour(4,'s1',this)">Samedi</div>
+    </div>
+
+    <!-- SEM A - LUNDI : UPPER 1 -->
+    <div class="jour-block" id="prog-s1-j1">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">LUNDI — BAS DU CORPS 1</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine A</div>
+      </div>
+      <div class="ex-card" data-key="a-mar-squat"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Squat</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge (ex: 100kg)" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-mar-deadsumo"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Deadlift Sumo</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-mar-presse"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Presse a cuisse</div><div class="ex-sets">3 séries de 10 à 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="leg-curl"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Leg Curl</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="mollet"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Mollet</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="lombaires"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Lombaires</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+
+    <!-- SEM A - MARDI : LOWER 1 -->
+    <div class="jour-block" id="prog-s1-j2" style="display:none">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">MARDI — HAUT DU CORPS 1</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine A</div>
+      </div>
+      <div class="ex-card" data-key="a-lun-couche"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Dev. Couche Barre</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge (ex: 80kg)" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-lun-rowing"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Rowing Barre</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-lun-ohp"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Over Head Press</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="traction-neutre"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Traction Neutre</div><div class="ex-sets">3 séries de 9 à 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-lun-ecarté"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Ecarté Couche</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-lun-biceps"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Biceps Curl</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="crunch-poulie"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Crunch Poulie</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+
+    <!-- SEM A - JEUDI : UPPER 2 -->
+    <div class="jour-block" id="prog-s1-j3" style="display:none">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">JEUDI — BAS DU CORPS 2</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine A</div>
+      </div>
+      <div class="ex-card" data-key="a-sam-dead"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Deadlift</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-sam-fsquat"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Front Squat</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="fentes"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Fentes</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="leg-extension"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Leg Extension</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="mollet-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Mollet</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="lombaires-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Lombaires</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+
+    <!-- SEM A - SAMEDI : LOWER 2 -->
+    <div class="jour-block" id="prog-s1-j4" style="display:none">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">SAMEDI — HAUT DU CORPS 2</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine A</div>
+      </div>
+      <div class="ex-card" data-key="a-jeu-mil"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Dev. Militaire</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="traction-pro"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Traction Pro</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-jeu-inclB"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Dev. Incl. Barre</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-jeu-rowH"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Row Halt.</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-jeu-elevL"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Elevations Lat.</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="a-jeu-triceps"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Triceps Extension</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="facepull"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Facepull</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="abdos-roulette"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Abdos Roulette</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+  </div>
+
+  <!-- SEMAINE B -->
+  <div id="prog-s2" style="display:none">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px">
+      <div class="jour-btn on" onclick="selectJour(1,'s2',this)">Lundi</div>
+      <div class="jour-btn" onclick="selectJour(2,'s2',this)">Mardi</div>
+      <div class="jour-btn" onclick="selectJour(3,'s2',this)">Jeudi</div>
+      <div class="jour-btn" onclick="selectJour(4,'s2',this)">Samedi</div>
+    </div>
+
+    <!-- SEM B - LUNDI : UPPER 1 -->
+    <div class="jour-block" id="prog-s2-j1">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">LUNDI — BAS DU CORPS 1</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine B</div>
+      </div>
+      <div class="ex-card" data-key="b-mar-fsquat"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Front Squat</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-mar-dead"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Deadlift</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-mar-presse"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Presse a cuisse</div><div class="ex-sets">3 séries de 10 à 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="leg-curl-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Leg Curl</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="mollet-3"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Mollet</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="lombaires-3"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Lombaires</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+
+    <!-- SEM B - MARDI : LOWER 1 -->
+    <div class="jour-block" id="prog-s2-j2" style="display:none">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">MARDI — HAUT DU CORPS 1</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine B</div>
+      </div>
+      <div class="ex-card" data-key="b-lun-coucheh"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Dev. Couche Halt.</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-lun-rowingT"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Rowing T Barre</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-lun-mil"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Dev. Militaire</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="traction-supi"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Traction Supi</div><div class="ex-sets">3 séries de 9 à 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-lun-peck"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Peck Deck</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-lun-bicepsM"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Biceps Curl Marteau</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="crunch-poulie-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Crunch Poulie</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+
+    <!-- SEM B - JEUDI : UPPER 2 -->
+    <div class="jour-block" id="prog-s2-j3" style="display:none">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">JEUDI — BAS DU CORPS 2</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine B</div>
+      </div>
+      <div class="ex-card" data-key="b-sam-deadS"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Deadlift Sumo</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-sam-squat"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Squat</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="fentes-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Fentes</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="leg-extension-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Leg Extension</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="mollet-4"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Mollet</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="lombaires-4"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Lombaires</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+
+    <!-- SEM B - SAMEDI : LOWER 2 -->
+    <div class="jour-block" id="prog-s2-j4" style="display:none">
+      <div class="card" style="padding:12px 14px;margin-bottom:12px;border-color:var(--gold)">
+        <div style="font-size:11px;font-weight:800;color:var(--gold);letter-spacing:0.1em">SAMEDI — HAUT DU CORPS 2</div>
+        <div style="font-size:11px;color:var(--muted);margin-top:2px">Semaine B</div>
+      </div>
+      <div class="ex-card" data-key="b-jeu-ohp"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Over Head Press</div><div class="ex-sets">3 séries de 4 à 6 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="traction-pro-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Traction Pro</div><div class="ex-sets">3 séries de 6 à 8 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-jeu-inclH"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Dev. Incl. Halt.</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-jeu-rowH"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Row Haltere</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-jeu-elevL"><div class="ex-top"><span class="ex-ic">🏋️</span><div><div class="ex-name">Elevations Lat.</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="b-jeu-triceps"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Triceps Extension</div><div class="ex-sets">3 séries de 10 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="peck-deck-inverse"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Peck Deck Inverse</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+      <div class="ex-card" data-key="abdos-roulette-2"><div class="ex-top"><span class="ex-ic">💪</span><div><div class="ex-name">Abdos Roulette</div><div class="ex-sets">3 séries de 15 rép.</div></div></div><input class="ex-weight" type="text" placeholder="Charge" oninput="saveW_ex(this.closest('[data-key]').dataset.key,this.value)"/></div>
+    </div>
+  </div>
+
+
+  <!-- REST TIMER -->
+  <div style="position:sticky;bottom:calc(20px + var(--sb));display:flex;justify-content:flex-end;padding:0 20px;pointer-events:none">
+    <div id="timer-btn" onclick="toggleTimer()" style="pointer-events:all;width:72px;height:72px;border-radius:50%;background:var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 4px 20px rgba(201,168,76,0.4);transition:all 0.2s;user-select:none;-webkit-user-select:none">
+      <div id="timer-display" style="font-size:16px;font-weight:900;color:#0d1117;line-height:1">REST</div>
+      <div id="timer-sub" style="font-size:9px;font-weight:700;color:#0d1117;opacity:0.7;margin-top:1px">appuie</div>
+    </div>
+  </div>
+</div>
+</div>
+<div class="page" id="page-religion">
+  <div class="ph"><button class="bk" onclick="goHome()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><div class="ptit">&#x1F319; Religion</div></div>
+  <div style="padding:10px 16px 0;flex-shrink:0"><div class="tabs"><div class="tab on" onclick="rtab('dhikr',this)">&#x1F4FF; Quotidien</div><div class="tab" onclick="rtab('duaa',this)">&#x1F932; Duaa</div><div class="tab" onclick="rtab('appren',this)">&#x1F4DA; Apprentissage</div><div class="tab" onclick="rtab('salat',this)">&#x1F54C; Prières</div></div></div>
+    <div class="pc" id="rel-salat" style="display:none">
+
+    <!-- LOCATION STATUS -->
+    <div id="prayer-status" class="card" style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+      <span style="font-size:24px">📍</span>
+      <div>
+        <div style="font-size:12px;font-weight:700;color:var(--text)" id="prayer-city">Localisation en cours...</div>
+        <div style="font-size:11px;color:var(--muted)" id="prayer-date"></div>
+      </div>
+      <button onclick="loadPrayers()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--gold);font-size:11px;padding:6px 14px;border-radius:20px;cursor:pointer">↻</button>
+    </div>
+
+    <!-- NEXT PRAYER HIGHLIGHT -->
+    <div id="next-prayer-card" class="card" style="background:rgba(201,168,76,0.08);border-color:var(--gold);text-align:center;margin-bottom:16px;display:none">
+      <div style="font-size:11px;color:var(--muted);margin-bottom:4px">Prochaine prière</div>
+      <div style="font-size:22px;font-weight:900;color:var(--gold)" id="np-name">-</div>
+      <div style="font-size:32px;font-weight:900;color:var(--text);margin:4px 0" id="np-time">-</div>
+      <div style="font-size:13px;color:var(--muted)" id="np-countdown">-</div>
+    </div>
+
+    <!-- ALL PRAYERS -->
+    <div id="prayers-list"></div>
+
+    <!-- NOTIFICATION PERMISSION -->
+    <button id="notif-btn" onclick="requestPrayerNotif()" style="width:100%;margin-top:12px;background:rgba(201,168,76,0.1);border:1px solid var(--gold);color:var(--gold);font-size:13px;font-weight:700;padding:14px;border-radius:16px;cursor:pointer">
+      🔔 Activer les rappels de prière
+    </button>
+
+  </div>
+<div class="pc" id="rel-dhikr">
+
+  <!-- IDEES DE DHIKR -->
+  <div class="card" style="margin-bottom:20px">
+    <div style="font-size:12px;font-weight:800;color:var(--gold);letter-spacing:0.08em;margin-bottom:10px">&#x1F4A1; Idées de dhikr</div>
+    <div class="dhikr-ideas">
+      <div class="dhikr-idea">سُبْحَانَ اللّٰه<span>Subhanallah</span></div>
+      <div class="dhikr-idea">اَلْحَمْدُ لِلّٰه<span>Alhamdoulillah</span></div>
+      <div class="dhikr-idea">اَللّٰهُ أَكْبَر<span>Allahu Akbar</span></div>
+      <div class="dhikr-idea">لَا إِلٰهَ إِلَّا اللّٰه<span>La ilaha illallah</span></div>
+      <div class="dhikr-idea">أَسْتَغْفِرُ اللّٰه<span>Astaghfirullah</span></div>
+      <div class="dhikr-idea">لَا حَوْلَ وَلَا قُوَّةَ إِلَّا بِاللّٰه<span>La hawla wala quwwata...</span></div>
+    </div>
+  </div>
+
+  <!-- COMPTEUR -->
+  <div style="display:flex;flex-direction:column;align-items:center;gap:24px;padding:10px 0 30px">
+    <div id="dhikr-count" style="font-size:72px;font-weight:900;color:var(--gold);line-height:1;letter-spacing:-2px">0</div>
+    <div
+      onclick="incrementDhikr()"
+      style="width:140px;height:140px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold2));display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 6px 30px rgba(201,168,76,0.45);transition:transform 0.1s,box-shadow 0.1s;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none"
+      onpointerdown="this.style.transform='scale(0.93)';this.style.boxShadow='0 2px 12px rgba(201,168,76,0.3)'"
+      onpointerup="this.style.transform='scale(1)';this.style.boxShadow='0 6px 30px rgba(201,168,76,0.45)'"
+      onpointerleave="this.style.transform='scale(1)';this.style.boxShadow='0 6px 30px rgba(201,168,76,0.45)'"
+    >
+      <span style="font-size:48px">&#x1F4FF;</span>
+    </div>
+    <button onclick="resetDhikr()" style="background:none;border:1px solid var(--border);color:var(--muted);font-size:12px;padding:8px 20px;border-radius:20px;cursor:pointer">&#x21BA; Remettre à zéro</button>
+  </div>
+
+</div>
+<div class="pc" id="rel-appren" style="display:none">
+
+    <!-- PROGRESS BAR -->
+    <div class="card" style="margin-bottom:18px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <div style="font-size:13px;font-weight:800;color:var(--gold)">&#x1F3AF; Objectif : fin d'année</div>
+        <div style="font-size:22px;font-weight:900;color:var(--gold)" id="learn-pct">0%</div>
+      </div>
+      <div class="pbar-bg"><div class="pbar" id="learn-bar" style="width:0%"></div></div>
+      <div style="font-size:11px;color:var(--muted);margin-top:8px;text-align:center" id="learn-count">0 / 49 éléments complétés</div>
+    </div>
+
+    <!-- JUZZ AMMA -->
+    <div class="accord-hd" onclick="toggleAccord('juzz')">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span>&#x1F4D6;</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--text)">Juzz Amma</div>
+          <div style="font-size:11px;color:var(--muted)" id="juzz-count">0/37 sourates apprises</div>
+        </div>
+      </div>
+      <div class="accord-arrow" id="arr-juzz">&#x276F;</div>
+    </div>
+    <div class="accord-body" id="accord-juzz">
+    <div class="learn-grid" id="juzz-grid">
+<div class="learn-item" data-key="juzz-78" onclick="toggleLearn('juzz-78',this)"><div class="li-check" id="lck-juzz-78">&#x2713;</div><div class="li-body"><div class="li-name">Sourate An-Naba</div><div class="li-sub">Sourate 78 — La Nouvelle</div></div></div>
+<div class="learn-item" data-key="juzz-79" onclick="toggleLearn('juzz-79',this)"><div class="li-check" id="lck-juzz-79">&#x2713;</div><div class="li-body"><div class="li-name">Sourate An-Nazi'at</div><div class="li-sub">Sourate 79 — Les Anges</div></div></div>
+<div class="learn-item" data-key="juzz-80" onclick="toggleLearn('juzz-80',this)"><div class="li-check" id="lck-juzz-80">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Abasa</div><div class="li-sub">Sourate 80 — Il a froncé</div></div></div>
+<div class="learn-item" data-key="juzz-81" onclick="toggleLearn('juzz-81',this)"><div class="li-check" id="lck-juzz-81">&#x2713;</div><div class="li-body"><div class="li-name">Sourate At-Takwir</div><div class="li-sub">Sourate 81 — L'Enroulement</div></div></div>
+<div class="learn-item" data-key="juzz-82" onclick="toggleLearn('juzz-82',this)"><div class="li-check" id="lck-juzz-82">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Infitar</div><div class="li-sub">Sourate 82 — La Déchirure</div></div></div>
+<div class="learn-item" data-key="juzz-83" onclick="toggleLearn('juzz-83',this)"><div class="li-check" id="lck-juzz-83">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Mutaffifin</div><div class="li-sub">Sourate 83 — Les Fraudeurs</div></div></div>
+<div class="learn-item" data-key="juzz-84" onclick="toggleLearn('juzz-84',this)"><div class="li-check" id="lck-juzz-84">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Inshiqaq</div><div class="li-sub">Sourate 84 — La Fissure</div></div></div>
+<div class="learn-item" data-key="juzz-85" onclick="toggleLearn('juzz-85',this)"><div class="li-check" id="lck-juzz-85">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Buruj</div><div class="li-sub">Sourate 85 — Les Constellations</div></div></div>
+<div class="learn-item" data-key="juzz-86" onclick="toggleLearn('juzz-86',this)"><div class="li-check" id="lck-juzz-86">&#x2713;</div><div class="li-body"><div class="li-name">Sourate At-Tariq</div><div class="li-sub">Sourate 86 — L'Astre nocturne</div></div></div>
+<div class="learn-item" data-key="juzz-87" onclick="toggleLearn('juzz-87',this)"><div class="li-check" id="lck-juzz-87">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-A'la</div><div class="li-sub">Sourate 87 — Le Très-Haut</div></div></div>
+<div class="learn-item" data-key="juzz-88" onclick="toggleLearn('juzz-88',this)"><div class="li-check" id="lck-juzz-88">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Ghashiya</div><div class="li-sub">Sourate 88 — L'Enveloppante</div></div></div>
+<div class="learn-item" data-key="juzz-89" onclick="toggleLearn('juzz-89',this)"><div class="li-check" id="lck-juzz-89">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Fajr</div><div class="li-sub">Sourate 89 — L'Aube</div></div></div>
+<div class="learn-item" data-key="juzz-90" onclick="toggleLearn('juzz-90',this)"><div class="li-check" id="lck-juzz-90">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Balad</div><div class="li-sub">Sourate 90 — La Cité</div></div></div>
+<div class="learn-item" data-key="juzz-91" onclick="toggleLearn('juzz-91',this)"><div class="li-check" id="lck-juzz-91">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Ash-Shams</div><div class="li-sub">Sourate 91 — Le Soleil</div></div></div>
+<div class="learn-item" data-key="juzz-92" onclick="toggleLearn('juzz-92',this)"><div class="li-check" id="lck-juzz-92">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Layl</div><div class="li-sub">Sourate 92 — La Nuit</div></div></div>
+<div class="learn-item" data-key="juzz-93" onclick="toggleLearn('juzz-93',this)"><div class="li-check" id="lck-juzz-93">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Ad-Duhaa</div><div class="li-sub">Sourate 93 — Le Matin</div></div></div>
+<div class="learn-item" data-key="juzz-94" onclick="toggleLearn('juzz-94',this)"><div class="li-check" id="lck-juzz-94">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Ash-Sharh</div><div class="li-sub">Sourate 94 — La Dilatation</div></div></div>
+<div class="learn-item" data-key="juzz-95" onclick="toggleLearn('juzz-95',this)"><div class="li-check" id="lck-juzz-95">&#x2713;</div><div class="li-body"><div class="li-name">Sourate At-Tin</div><div class="li-sub">Sourate 95 — Le Figuier</div></div></div>
+<div class="learn-item" data-key="juzz-96" onclick="toggleLearn('juzz-96',this)"><div class="li-check" id="lck-juzz-96">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Alaq</div><div class="li-sub">Sourate 96 — L'Adhérence</div></div></div>
+<div class="learn-item" data-key="juzz-97" onclick="toggleLearn('juzz-97',this)"><div class="li-check" id="lck-juzz-97">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Qadr</div><div class="li-sub">Sourate 97 — La Destinée</div></div></div>
+<div class="learn-item" data-key="juzz-98" onclick="toggleLearn('juzz-98',this)"><div class="li-check" id="lck-juzz-98">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Bayyina</div><div class="li-sub">Sourate 98 — La Preuve</div></div></div>
+<div class="learn-item" data-key="juzz-99" onclick="toggleLearn('juzz-99',this)"><div class="li-check" id="lck-juzz-99">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Az-Zalzala</div><div class="li-sub">Sourate 99 — Le Séisme</div></div></div>
+<div class="learn-item" data-key="juzz-100" onclick="toggleLearn('juzz-100',this)"><div class="li-check" id="lck-juzz-100">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Adiyat</div><div class="li-sub">Sourate 100 — Les Coursiers</div></div></div>
+<div class="learn-item" data-key="juzz-101" onclick="toggleLearn('juzz-101',this)"><div class="li-check" id="lck-juzz-101">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Qari'a</div><div class="li-sub">Sourate 101 — Le Fracas</div></div></div>
+<div class="learn-item" data-key="juzz-102" onclick="toggleLearn('juzz-102',this)"><div class="li-check" id="lck-juzz-102">&#x2713;</div><div class="li-body"><div class="li-name">Sourate At-Takathur</div><div class="li-sub">Sourate 102 — L'Accumulation</div></div></div>
+<div class="learn-item" data-key="juzz-103" onclick="toggleLearn('juzz-103',this)"><div class="li-check" id="lck-juzz-103">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Asr</div><div class="li-sub">Sourate 103 — L'Époque</div></div></div>
+<div class="learn-item" data-key="juzz-104" onclick="toggleLearn('juzz-104',this)"><div class="li-check" id="lck-juzz-104">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Humaza</div><div class="li-sub">Sourate 104 — Le Calomniateur</div></div></div>
+<div class="learn-item" data-key="juzz-105" onclick="toggleLearn('juzz-105',this)"><div class="li-check" id="lck-juzz-105">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Fil</div><div class="li-sub">Sourate 105 — L'Éléphant</div></div></div>
+<div class="learn-item" data-key="juzz-106" onclick="toggleLearn('juzz-106',this)"><div class="li-check" id="lck-juzz-106">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Quraysh</div><div class="li-sub">Sourate 106 — Quraysh</div></div></div>
+<div class="learn-item" data-key="juzz-107" onclick="toggleLearn('juzz-107',this)"><div class="li-check" id="lck-juzz-107">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Ma'un</div><div class="li-sub">Sourate 107 — L'Ustensile</div></div></div>
+<div class="learn-item" data-key="juzz-108" onclick="toggleLearn('juzz-108',this)"><div class="li-check" id="lck-juzz-108">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Kawthar</div><div class="li-sub">Sourate 108 — L'Abondance</div></div></div>
+<div class="learn-item" data-key="juzz-109" onclick="toggleLearn('juzz-109',this)"><div class="li-check" id="lck-juzz-109">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Kafirun</div><div class="li-sub">Sourate 109 — Les Mécréants</div></div></div>
+<div class="learn-item" data-key="juzz-110" onclick="toggleLearn('juzz-110',this)"><div class="li-check" id="lck-juzz-110">&#x2713;</div><div class="li-body"><div class="li-name">Sourate An-Nasr</div><div class="li-sub">Sourate 110 — Le Secours</div></div></div>
+<div class="learn-item" data-key="juzz-111" onclick="toggleLearn('juzz-111',this)"><div class="li-check" id="lck-juzz-111">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Masad</div><div class="li-sub">Sourate 111 — La Tresse</div></div></div>
+<div class="learn-item" data-key="juzz-112" onclick="toggleLearn('juzz-112',this)"><div class="li-check" id="lck-juzz-112">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Ikhlas</div><div class="li-sub">Sourate 112 — La Pureté</div></div></div>
+<div class="learn-item" data-key="juzz-113" onclick="toggleLearn('juzz-113',this)"><div class="li-check" id="lck-juzz-113">&#x2713;</div><div class="li-body"><div class="li-name">Sourate Al-Falaq</div><div class="li-sub">Sourate 113 — L'Aube naissante</div></div></div>
+<div class="learn-item" data-key="juzz-114" onclick="toggleLearn('juzz-114',this)"><div class="li-check" id="lck-juzz-114">&#x2713;</div><div class="li-body"><div class="li-name">Sourate An-Nas</div><div class="li-sub">Sourate 114 — Les Hommes</div></div></div>
+    </div>
+    </div>
+
+    <!-- IBN ACHIR -->
+    <div class="accord-hd" onclick="toggleAccord('ibn')" style="margin-top:12px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span>&#x1F4DC;</span>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--text)">Matn d'Ibn Achir</div>
+          <div style="font-size:11px;color:var(--muted)" id="ibn-count">0/12 chapitres appris</div>
+        </div>
+      </div>
+      <div class="accord-arrow" id="arr-ibn">&#x276F;</div>
+    </div>
+    <div class="accord-body" id="accord-ibn">
+    <div id="ibn-grid">
+<div class="learn-item" data-key="ibn-0" onclick="toggleLearn('ibn-0',this)"><div class="li-check" id="lck-ibn-0">&#x2713;</div><div class="li-body"><div class="li-name">Introduction et définition de la science</div></div></div>
+<div class="learn-item" data-key="ibn-1" onclick="toggleLearn('ibn-1',this)"><div class="li-check" id="lck-ibn-1">&#x2713;</div><div class="li-body"><div class="li-name">Les obligations religieuses (Fard Ayn)</div></div></div>
+<div class="learn-item" data-key="ibn-2" onclick="toggleLearn('ibn-2',this)"><div class="li-check" id="lck-ibn-2">&#x2713;</div><div class="li-body"><div class="li-name">La Purification (At-Tahara)</div></div></div>
+<div class="learn-item" data-key="ibn-3" onclick="toggleLearn('ibn-3',this)"><div class="li-check" id="lck-ibn-3">&#x2713;</div><div class="li-body"><div class="li-name">La Prière (As-Salat)</div></div></div>
+<div class="learn-item" data-key="ibn-4" onclick="toggleLearn('ibn-4',this)"><div class="li-check" id="lck-ibn-4">&#x2713;</div><div class="li-body"><div class="li-name">L'Aumône légale (Az-Zakat)</div></div></div>
+<div class="learn-item" data-key="ibn-5" onclick="toggleLearn('ibn-5',this)"><div class="li-check" id="lck-ibn-5">&#x2713;</div><div class="li-body"><div class="li-name">Le Jeûne (As-Sawm)</div></div></div>
+<div class="learn-item" data-key="ibn-6" onclick="toggleLearn('ibn-6',this)"><div class="li-check" id="lck-ibn-6">&#x2713;</div><div class="li-body"><div class="li-name">Le Pèlerinage (Al-Hajj)</div></div></div>
+<div class="learn-item" data-key="ibn-7" onclick="toggleLearn('ibn-7',this)"><div class="li-check" id="lck-ibn-7">&#x2713;</div><div class="li-body"><div class="li-name">Les fondements de la Aqida</div></div></div>
+<div class="learn-item" data-key="ibn-8" onclick="toggleLearn('ibn-8',this)"><div class="li-check" id="lck-ibn-8">&#x2713;</div><div class="li-body"><div class="li-name">Les attributs d'Allah</div></div></div>
+<div class="learn-item" data-key="ibn-9" onclick="toggleLearn('ibn-9',this)"><div class="li-check" id="lck-ibn-9">&#x2713;</div><div class="li-body"><div class="li-name">La foi au Prophète ﷺ</div></div></div>
+<div class="learn-item" data-key="ibn-10" onclick="toggleLearn('ibn-10',this)"><div class="li-check" id="lck-ibn-10">&#x2713;</div><div class="li-body"><div class="li-name">La Voie spirituelle (At-Tariqa)</div></div></div>
+<div class="learn-item" data-key="ibn-11" onclick="toggleLearn('ibn-11',this)"><div class="li-check" id="lck-ibn-11">&#x2713;</div><div class="li-body"><div class="li-name">Conclusion et recommandations</div></div></div>
+    </div>
+    </div>
+
+  </div>
+  <div class="pc" id="rel-duaa" style="display:none">
+    <div class="darea">
+      <div style="font-size:14px;font-weight:800;color:var(--gold);margin-bottom:10px">&#x1F932; Ecrire une duaa</div>
+      <textarea class="dta" id="duaa-in" placeholder="Ya Allah, je Te demande..." oninput="saveDuaaDraft(this.value)"></textarea>
+      <button class="wbtn" style="margin-top:10px" onclick="saveDuaa()">Sauvegarder &#x2014; Amine</button>
+    </div>
+    <div class="stit">Mes duaa</div>
+    <div id="duaa-list"></div>
+  </div>
+</div>
+
+<div class="page" id="page-projet">
+  <div class="ph"><button class="bk" onclick="goHome()"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 5l-7 7 7 7"/></svg></button><div class="ptit">&#x1F680; Projets</div></div>
+  <div class="pc"><div class="ip"><div class="ip-ic">&#x1F680;</div><div class="ip-t">Projets en preparation</div><div class="ip-s">Dis-moi tes projets et j'ajouterai progressions et objectifs.</div></div></div>
+</div>
+<div id="bnav">
+  <div class="ni active" onclick="navTo('home')" id="nav-home"><div class="ni-i">&#x1F3E0;</div><div class="ni-l">Accueil</div></div>
+  <div class="ni" onclick="navTo('sport')" id="nav-sport"><div class="ni-i">&#x1F4AA;</div><div class="ni-l">Sport</div></div>
+  <div class="ni" onclick="navTo('religion')" id="nav-religion"><div class="ni-i">&#x1F319;</div><div class="ni-l">Religion</div></div>
+  <div class="ni" onclick="navTo('projet')" id="nav-projet"><div class="ni-i">&#x1F680;</div><div class="ni-l">Projets</div></div>
+</div>
+</div><!-- /app -->
+<div class="mo" id="fm"><div class="modal"><div class="mt">Ajouter un repas</div><input class="mi" id="fn" placeholder="Nom du repas"/><input class="mi" id="fc" type="number" placeholder="Calories (kcal)" min="0"/><div class="mr"><button class="btn-mc" onclick="closeFM()">Annuler</button><button class="btn-mo" onclick="addFood()">Ajouter</button></div></div></div>
+<div id="toast"></div>
+<script>
+window.addEventListener('DOMContentLoaded',function(){
+  setTimeout(function(){
+    document.getElementById('splash').classList.add('gone');
+  },600);
+});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
+function reqN(){if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();}
+function doN(){
+  if(Notification.permission!=='granted')return;
+  var today=new Date().toDateString();
+  if(localStorage.getItem('sh_daily')!==today){new Notification('Souhill - Rappel du jour',{body:'Dhikr, checklist, smoothie... Bismillah !',icon:'./icons/icon-192.png'});localStorage.setItem('sh_daily',today);}
+  var lw=parseInt(localStorage.getItem('sh_lastW')||'0');
+  if(Date.now()-lw>6*24*3600*1000)new Notification('Souhill - Mise a jour poids',{body:'Une semaine ecoule ! Pese-toi et prends une photo.',icon:'./icons/icon-192.png'});
+}
+var S={
+  load:function(k,d){try{var v=localStorage.getItem('sh_'+k);return v!==null?JSON.parse(v):d;}catch(e){return d;}},
+  save:function(k,v){try{localStorage.setItem('sh_'+k,JSON.stringify(v));}catch(e){}}
+};
+function td(){return new Date().toISOString().split('T')[0];}
+function wk(){var d=new Date(),y=d.getFullYear(),s=new Date(y,0,1),w=Math.ceil(((d-s)/86400000+s.getDay()+1)/7);return y+'-W'+w;}
+var poids=S.load('poids',{actuel:60,objectif:70,depart:60});
+var foods=S.load('foods_'+td(),[]);
+
+var duaas=S.load('duaas',[]);
+var photos=S.load('photos',[]);
+var suppCk=S.load('suppCk_'+td(),{matin:false,midi:false,soir:false});
+
+function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function toast(m){var t=document.getElementById('toast');t.textContent=m;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2200);}
+function renderP(){
+  var a=poids.actuel,o=poids.objectif,dep=poids.depart;
+  var pct=Math.min(100,Math.max(0,Math.round(((a-dep)/(o-dep))*100)));
+  document.getElementById('p-bar').style.width=pct+'%';
+  document.getElementById('p-act').textContent=a;
+  document.getElementById('p-rest').textContent=Math.max(0,o-a);
+  document.getElementById('p-pct').textContent=pct+'%';
+  document.getElementById('p-lbl').textContent=a+' -> '+o+' kg';
+}
+function toggleW(){
+  var r=document.getElementById('wrow'),b=document.getElementById('wbtn'),open=r.classList.contains('on');
+  r.classList.toggle('on',!open);
+  b.textContent=open?'Mettre a jour mon poids':'Annuler';
+}
+function saveW(){
+  var v=parseFloat(document.getElementById('new-w').value);
+  if(!v||v<40||v>200){toast('Poids invalide');return;}
+  poids.actuel=v;S.save('poids',poids);localStorage.setItem('sh_lastW',Date.now());
+  renderP();toggleW();document.getElementById('new-w').value='';toast('Poids mis a jour : '+v+' kg');
+}
+function renderPhotos(){
+  var g=document.getElementById('pgrid');
+  var cnt=document.getElementById('photo-count');
+  // Group photos by week
+  var byWeek={};
+  photos.forEach(function(p,i){
+    if(!byWeek[p.week])byWeek[p.week]=[];
+    byWeek[p.week].push({p:p,i:i});
+  });
+  var weeks=Object.keys(byWeek).sort().reverse();
+  if(weeks.length===0){
+    cnt.textContent='Aucune photo — ajoutes-en une !';
+    g.innerHTML='';
+    return;
+  }
+  cnt.textContent=weeks.length+' semaine'+(weeks.length>1?'s':'')+' — glisse pour voir →';
+  var h='';
+  weeks.forEach(function(w){
+    var entries=byWeek[w];
+    var face=entries.find(function(e){return e.p.type==='face';});
+    var dos=entries.find(function(e){return e.p.type==='dos';});
+    var date='';
+    if(entries[0]){var d=new Date(entries[0].p.date);date=d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});}
+    h+='<div class="pweek">';
+    h+='<div class="pweek-lbl">Sem. '+getWeekNum(new Date(entries[0].p.date))+' &mdash; '+date+'</div>';
+    h+='<div class="pweek-grid">';
+    // Face slot
+    if(face){
+      h+='<div class="pslot" data-idx="'+face.i+'">'
+        +'<img src="'+face.p.dataUrl+'" loading="lazy" style="pointer-events:none"/>'
+        +'<div class="plbl">Face</div>'
+        +'<div class="pdel" data-del="'+face.i+'">&#x1F5D1;</div>'
+        +'</div>';
+    } else {
+      h+='<div class="pslot" style="cursor:pointer;border-style:dashed" onclick="triggerFace()"><div class="padd">&#x1F4F7;</div><div class="pals">Face</div></div>';
+    }
+    // Dos slot
+    if(dos){
+      h+='<div class="pslot" data-idx="'+dos.i+'">'
+        +'<img src="'+dos.p.dataUrl+'" loading="lazy" style="pointer-events:none"/>'
+        +'<div class="plbl">Dos</div>'
+        +'<div class="pdel" data-del="'+dos.i+'">&#x1F5D1;</div>'
+        +'</div>';
+    } else {
+      h+='<div class="pslot" style="cursor:pointer;border-style:dashed" onclick="triggerDos()"><div class="padd">&#x1F4F7;</div><div class="pals">Dos</div></div>';
+    }
+    h+='</div></div>';
+  });
+  g.innerHTML=h;
+  g.onclick=function(e){
+    var del=e.target.closest('[data-del]');
+    if(del){e.stopPropagation();delPhoto(parseInt(del.dataset.del));return;}
+    var slot=e.target.closest('.pslot[data-idx]');
+    if(slot){
+      var idx=parseInt(slot.dataset.idx);
+      var p=photos[idx];
+      if(p){var d=new Date(p.date);zoomPhoto(p.dataUrl,'Sem. '+getWeekNum(d)+' - '+d.toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'}));}
+    }
+  };
+}
+function getWeekNum(d){
+  var y=d.getFullYear(),s=new Date(y,0,1);
+  return Math.ceil(((d-s)/86400000+s.getDay()+1)/7);
+}
+function zoomPhoto(src,lbl){
+  var z=document.createElement('div');
+  z.className='pzoom';
+  z.innerHTML='<div class="pzoom-close" onclick="this.parentNode.remove()">&#x2715;</div>'
+    +'<img src="'+src+'"/>'
+    +'<div class="pzoom-lbl">'+lbl+'</div>';
+  z.onclick=function(e){if(e.target===z)z.remove();};
+  document.body.appendChild(z);
+}
+function triggerFace(){document.getElementById('ph-face').click();}
+function triggerDos(){document.getElementById('ph-dos').click();}
+function triggerPhotoInput(){document.getElementById('ph-face').click();}
+function addPhotoTyped(e,type){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    photos.push({week:wk(),date:Date.now(),type:type,dataUrl:ev.target.result});
+    if(photos.length>104)photos=photos.slice(-104);
+    S.save('photos',photos);renderPhotos();
+    toast(type==='face'?'Photo Face ajoutee !':'Photo Dos ajoutee !');
+  };
+  r.readAsDataURL(f);e.target.value='';
+}
+function addPhoto(e){
+  var f=e.target.files[0];if(!f)return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    photos.push({week:wk(),date:Date.now(),type:'face',dataUrl:ev.target.result});
+    if(photos.length>104)photos=photos.slice(-104);
+    S.save('photos',photos);renderPhotos();toast('Photo ajoutee !');
+  };
+  r.readAsDataURL(f);e.target.value='';
+}
+function delPhoto(i){
+  if(!confirm('Supprimer cette photo ?'))return;
+  photos.splice(i,1);S.save('photos',photos);renderPhotos();toast('Photo supprimee.');
+}
+function renderCals(){
+  var tot=0;for(var i=0;i<foods.length;i++)tot+=foods[i].cal;
+  var goal=3500,pct=Math.min(1,tot/goal),circ=2*Math.PI*36;
+  document.getElementById('cal-arc').style.strokeDashoffset=circ*(1-pct);
+  document.getElementById('c-tot').textContent=tot;
+  document.getElementById('c-tot2').textContent=tot;
+  document.getElementById('c-rest').textContent=Math.max(0,goal-tot);
+  var html='';
+  for(var j=0;j<foods.length;j++) html+='<div class="cfi"><span class="cfn">'+esc(foods[j].name)+'</span><span class="cfc">'+foods[j].cal+' kcal<span class="cfd" onclick="rmF('+j+')">x</span></span></div>';
+  document.getElementById('cfl').innerHTML=html;
+}
+function openFM(){document.getElementById('fm').classList.add('on');setTimeout(function(){document.getElementById('fn').focus();},100);}
+function closeFM(){document.getElementById('fm').classList.remove('on');document.getElementById('fn').value='';document.getElementById('fc').value='';}
+function addFood(){
+  var n=document.getElementById('fn').value.trim(),c=parseInt(document.getElementById('fc').value);
+  if(!n||!c||c<0){toast('Remplis les deux champs');return;}
+  foods.push({name:n,cal:c});S.save('foods_'+td(),foods);renderCals();closeFM();toast('Repas ajoute !');
+}
+function rmF(i){foods.splice(i,1);S.save('foods_'+td(),foods);renderCals();}
+function addSmoo(){foods.push({name:'Smoothie prise de masse',cal:1080});S.save('foods_'+td(),foods);renderCals();toast('Smoothie ajoute - 1 080 kcal !');}
+function openPCM(){document.getElementById('pcm').classList.add('on');}
+
+
+function addFoodPhoto(){var n=document.getElementById('fn-ph').value.trim()||'Repas photo';var c=parseInt(document.getElementById('fc-ph').value);if(!c||c<0){toast('Entre une estimation de calories');return;}foods.push({name:n,cal:c});S.save('foods_'+td(),foods);renderCals();closePCM();toast('Repas ajoute - '+c+' kcal !');}
+
+function renderDuaa(){
+  var el=document.getElementById('duaa-list');
+  if(!duaas.length){el.innerHTML='<div style="color:var(--muted);font-size:13px;text-align:center;padding:20px">Aucune duaa pour l instant</div>';return;}
+  var html='';
+  for(var i=duaas.length-1;i>=0;i--){
+    var d=duaas[i];
+    html+='<div class="dcard"><div class="dtxt">'+esc(d.text)+'</div><div class="dmeta"><span class="ddate">'+new Date(d.date).toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})+'</span>'+(d.realized?'<span class="dreal">Realisee - Alhamdoulillah</span>':'<button class="btn-rl" onclick="realD('+i+')">Marquee realisee</button>')+'</div></div>';
+  }
+  el.innerHTML=html;
+}
+function saveDuaaDraft(v){
+  S.save('duaa_draft', v);
+}
+function restoreDuaaDraft(){
+  var draft = S.load('duaa_draft', '');
+  var el = document.getElementById('duaa-in');
+  if(el && draft) el.value = draft;
+}
+function saveDuaa(){
+  S.save('duaa_draft', ''); // clear draft on save
+var t=document.getElementById('duaa-in').value.trim();if(!t){toast('Ecris ta duaa d abord');return;}duaas.push({text:t,date:Date.now(),realized:false});S.save('duaas',duaas);document.getElementById('duaa-in').value='';renderDuaa();toast('Duaa sauvegardee - Amine !');}
+function realD(i){duaas[i].realized=true;S.save('duaas',duaas);renderDuaa();toast('Alhamdoulillah ! Duaa realisee !');}
+function goPage(n){
+  document.getElementById('home').style.display='none';
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('page-'+n).classList.add('on');
+  document.getElementById('bnav').classList.add('on');
+  document.querySelectorAll('.ni').forEach(function(x){x.classList.remove('active');});
+  var nav=document.getElementById('nav-'+n);if(nav)nav.classList.add('active');
+}
+function goHome(){
+  document.getElementById('home').style.display='block';
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on');});
+  document.getElementById('bnav').classList.remove('on');
+  document.querySelectorAll('.ni').forEach(function(x){x.classList.remove('active');});
+  document.getElementById('nav-home').classList.add('active');
+}
+function navTo(n){if(n==='home'){goHome();return;}goPage(n);}
+function stab(t,el){document.getElementById('sp-alim').style.display=t==='alim'?'block':'none';document.getElementById('sp-pratique').style.display=t==='pratique'?'block':'none';document.querySelectorAll('#page-sport .tab').forEach(function(x){x.classList.remove('on');});el.classList.add('on');}
+document.getElementById('fm').addEventListener('click',function(e){if(e.target===this)closeFM();});
+function triggerPhotoInput(){document.getElementById("ph-in").click();}
+
+
+function saveW_ex(key, val){
+  var weights = S.load('ex_weights', {});
+  weights[key] = val;
+  S.save('ex_weights', weights);
+}
+function loadWeights(jour){
+  var weights = S.load('ex_weights', {});
+  document.querySelectorAll('#jour-'+jour+' .ex-card[data-key]').forEach(function(card){
+    var key = card.dataset.key;
+    var input = card.querySelector('.ex-weight');
+    if(input && weights[key]) input.value = weights[key];
+  });
+}
+function selectSemProg(n, el){
+  el.closest('.sem-tabs').querySelectorAll('.sem-tab').forEach(function(t){t.classList.remove('on');});
+  el.classList.add('on');
+  document.getElementById('prog-s1').style.display = n===1 ? 'block' : 'none';
+  document.getElementById('prog-s2').style.display = n===2 ? 'block' : 'none';
+  loadAllWeights();
+}
+function selectJour(n, sem, el){
+  // Reset all jour-btn in the current semaine container
+  document.querySelectorAll('#prog-'+sem+' .jour-btn').forEach(function(b){b.classList.remove('on');});
+  el.classList.add('on');
+  for(var i=1;i<=4;i++){
+    var block = document.getElementById('prog-'+sem+'-j'+i);
+    if(block) block.style.display = i===n ? 'block' : 'none';
+  }
+  loadAllWeights();
+}
+function saveW_ex(key, val){
+  var weights = S.load('ex_weights', {});
+  weights[key] = val;
+  S.save('ex_weights', weights);
+}
+function loadAllWeights(){
+  var weights = S.load('ex_weights', {});
+  document.querySelectorAll('.ex-card[data-key]').forEach(function(card){
+    var input = card.querySelector('.ex-weight');
+    if(input && weights[card.dataset.key]) input.value = weights[card.dataset.key];
+  });
+}
+function renderSupp(){
+  var keys=['matin','midi','soir'];
+  var done=keys.filter(function(k){return suppCk[k];}).length;
+  var arc=document.getElementById('supp-arc');
+  var num=document.getElementById('supp-num');
+  if(!arc||!num)return;
+  arc.setAttribute('stroke-dashoffset', 201*(1-done/3));
+  num.textContent=done;
+  keys.forEach(function(k){
+    var b=document.getElementById('sb-'+k);
+    if(b)b.className='supp-btn'+(suppCk[k]?' done':'');
+  });
+}
+function toggleSupp(k){
+  suppCk[k]=!suppCk[k];
+  S.save('suppCk_'+td(),suppCk);
+  renderSupp();
+  var msgs={matin:'Complements du matin pris !',midi:'Complements du midi pris !',soir:'Complements du soir pris !'};
+  if(suppCk[k])toast(msgs[k]);
+}
+
+var timerInterval = null;
+var timerSeconds = 0;
+var timerRunning = false;
+
+function toggleTimer(){
+  if(!timerRunning){
+    // Start timer
+    timerRunning = true;
+    timerSeconds = 0;
+    var btn = document.getElementById('timer-btn');
+    var sub = document.getElementById('timer-sub');
+    btn.style.background = '#f85149';
+    btn.style.boxShadow = '0 4px 20px rgba(248,81,73,0.5)';
+    sub.textContent = 'stop';
+    timerInterval = setInterval(function(){
+      timerSeconds++;
+      var m = Math.floor(timerSeconds / 60);
+      var s = timerSeconds % 60;
+      document.getElementById('timer-display').textContent =
+        (m > 0 ? m + ':' : '') + (s < 10 ? '0' : '') + s;
+    }, 1000);
+  } else {
+    // Stop and reset
+    clearInterval(timerInterval);
+    timerRunning = false;
+    timerSeconds = 0;
+    var btn = document.getElementById('timer-btn');
+    var sub = document.getElementById('timer-sub');
+    btn.style.background = 'var(--gold)';
+    btn.style.boxShadow = '0 4px 20px rgba(201,168,76,0.4)';
+    document.getElementById('timer-display').textContent = 'REST';
+    sub.textContent = 'appuie';
+  }
+}
+
+var learnData = S.load('learn_checks', {});
+var LEARN_TOTAL = 49;
+
+function toggleLearn(key, el){
+  learnData[key] = !learnData[key];
+  S.save('learn_checks', learnData);
+  renderLearn();checkMissedPrayer();if(typeof Notification!=="undefined"&&Notification.permission==="granted"){var nb=document.getElementById("notif-btn");if(nb){nb.textContent="✅ Rappels activés";nb.style.opacity="0.6";}}(function(){var el=document.getElementById("dhikr-count");if(el)el.textContent=S.load("dhikr_count",0);})();
+}
+
+
+
+
+var dhikrCount = S.load('dhikr_count', 0);
+function incrementDhikr(){
+  dhikrCount++;
+  S.save('dhikr_count', dhikrCount);
+  var el = document.getElementById('dhikr-count');
+  if(el) el.textContent = dhikrCount;
+}
+function resetDhikr(){
+  dhikrCount = 0;
+  S.save('dhikr_count', 0);
+  var el = document.getElementById('dhikr-count');
+  if(el) el.textContent = 0;
+  toast('Compteur remis à zéro');
+}
+
+// ========== PRAYER TIMES ==========
+var prayerNames = ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+var prayerLabels = {Fajr:'Fajr &#x1F305;',Sunrise:'Chourouk &#x1F31E;',Dhuhr:'Dhohr &#x2600;&#xFE0F;',Asr:'Asr &#x1F307;',Maghrib:'Maghrib &#x1F319;',Isha:'Icha &#x2B50;'};
+var prayerIcons = {Fajr:'🌅',Sunrise:'🌞',Dhuhr:'☀️',Asr:'🌇',Maghrib:'🌙',Isha:'⭐'};
+var currentPrayers = null;
+var prayerNotifTimers = [];
+var overlayCountdown = null;
+var overlaySeconds = 300;
+
+function rtab(t,el){
+  document.getElementById('rel-dhikr').style.display=t==='dhikr'?'block':'none';
+  document.getElementById('rel-duaa').style.display=t==='duaa'?'block':'none';
+  document.getElementById('rel-appren').style.display=t==='appren'?'block':'none';
+  document.getElementById('rel-salat').style.display=t==='salat'?'block':'none';
+  document.querySelectorAll('#page-religion .tab').forEach(function(x){x.classList.remove('on');});
+  el.classList.add('on');
+  if(t==='salat' && !currentPrayers) loadPrayers();
+}
+
+function loadPrayers(){
+  document.getElementById('prayer-city').textContent = 'Localisation en cours...';
+  if(!navigator.geolocation){
+    document.getElementById('prayer-city').textContent = 'Géolocalisation non supportée';
+    return;
+  }
+  navigator.geolocation.getCurrentPosition(function(pos){
+    var lat = pos.coords.latitude;
+    var lng = pos.coords.longitude;
+    var today = new Date();
+    var dd = String(today.getDate()).padStart(2,'0');
+    var mm = String(today.getMonth()+1).padStart(2,'0');
+    var yyyy = today.getFullYear();
+    var url = 'https://api.aladhan.com/v1/timings/'+dd+'-'+mm+'-'+yyyy+'?latitude='+lat+'&longitude='+lng+'&method=2';
+    fetch(url).then(function(r){return r.json();}).then(function(data){
+      var t = data.data.timings;
+      var meta = data.data.meta;
+      currentPrayers = t;
+      document.getElementById('prayer-city').textContent = '📍 ' + (meta.timezone || 'Votre position');
+      var days = ['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+      var months = ['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+      document.getElementById('prayer-date').textContent = days[today.getDay()] + ' ' + today.getDate() + ' ' + months[today.getMonth()] + ' ' + yyyy;
+      renderPrayersList(t);
+      updateNextPrayer(t);
+      schedulePrayerNotifs(t);
+      sendPrayersToSW(t);
+      S.save('cached_prayers', {timings: t, date: dd+'-'+mm+'-'+yyyy, tz: meta.timezone});
+    }).catch(function(){
+      // Try cache
+      var cached = S.load('cached_prayers', null);
+      if(cached){ currentPrayers=cached.timings; renderPrayersList(cached.timings); updateNextPrayer(cached.timings); document.getElementById('prayer-city').textContent = cached.tz + ' (cache)'; }
+      else { document.getElementById('prayer-city').textContent = 'Erreur de chargement'; }
+    });
+  }, function(){
+    document.getElementById('prayer-city').textContent = 'Permission refusée';
+  });
+}
+
+function renderPrayersList(t){
+  var prayers = ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+  var now = new Date();
+  var html = '';
+  prayers.forEach(function(p){
+    var time = t[p];
+    if(!time) return;
+    var parts = time.split(':');
+    var pDate = new Date(); pDate.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
+    var isPast = pDate < now;
+    html += '<div class="prayer-row'+(isPast?' prayer-past':'')+'">';
+    html += '<span style="font-size:20px">'+prayerIcons[p]+'</span>';
+    html += '<div style="flex:1"><div style="font-size:14px;font-weight:700;color:var(--text)">'+p+'</div></div>';
+    html += '<div style="font-size:16px;font-weight:800;color:'+(isPast?'var(--muted)':'var(--gold)')+'">'+time+'</div>';
+    html += '</div>';
+  });
+  document.getElementById('prayers-list').innerHTML = html;
+}
+
+function updateNextPrayer(t){
+  var prayers = ['Fajr','Sunrise','Dhuhr','Asr','Maghrib','Isha'];
+  var now = new Date();
+  var next = null; var nextName = null;
+  for(var i=0;i<prayers.length;i++){
+    var p = prayers[i]; var time = t[p]; if(!time) continue;
+    var parts = time.split(':');
+    var pDate = new Date(); pDate.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
+    if(pDate > now){ next = pDate; nextName = p; break; }
+  }
+  var card = document.getElementById('next-prayer-card');
+  if(!next || !card){ if(card) card.style.display='none'; return; }
+  card.style.display='block';
+  document.getElementById('np-name').textContent = nextName;
+  document.getElementById('np-time').textContent = t[nextName];
+  function updateCountdown(){
+    var diff = Math.max(0, next - new Date());
+    var h = Math.floor(diff/3600000);
+    var m = Math.floor((diff%3600000)/60000);
+    var s = Math.floor((diff%60000)/1000);
+    document.getElementById('np-countdown').textContent = (h>0?h+'h ':'')+m+'min '+s+'s';
+    if(diff > 0) setTimeout(updateCountdown, 1000);
+  }
+  updateCountdown();
+}
+
+function schedulePrayerNotifs(t){
+  prayerNotifTimers.forEach(clearTimeout);
+  prayerNotifTimers = [];
+  if(Notification.permission !== 'granted') return;
+  var prayers = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+  var now = new Date();
+  prayers.forEach(function(p){
+    var time = t[p]; if(!time) return;
+    var parts = time.split(':');
+    var pDate = new Date(); pDate.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
+    var diff = pDate - now;
+    if(diff > 0){
+      var tid = setTimeout(function(name){ showPrayerOverlay(name); }, diff, p);
+      prayerNotifTimers.push(tid);
+    }
+  });
+}
+
+function requestPrayerNotif(){
+  if(!('Notification' in window)){ toast('Notifications non supportées'); return; }
+  Notification.requestPermission().then(function(perm){
+    if(perm==='granted'){
+      document.getElementById('notif-btn').textContent = '✅ Rappels activés';
+      document.getElementById('notif-btn').style.opacity = '0.6';
+      if(currentPrayers) schedulePrayerNotifs(currentPrayers);
+      toast('Rappels de prière activés !');
+    } else {
+      toast('Permission refusée');
+    }
+  });
+}
+
+function showPrayerOverlay(prayerName){
+  var overlay = document.getElementById('prayer-overlay');
+  document.getElementById('po-name').textContent = prayerName;
+  overlay.style.display = 'flex';
+  overlaySeconds = 300;
+  var btn = document.getElementById('po-btn');
+  var sub = document.getElementById('po-sub');
+  btn.style.opacity = '0'; btn.style.pointerEvents = 'none';
+  if(Notification.permission==='granted'){
+    new Notification('🕌 Heure de la prière - ' + prayerName, {
+      body: 'Il est temps de faire ta prière. Va prier avant de retoucher à ton téléphone.',
+      icon: './icons/icon-192.png',
+      requireInteraction: true
+    });
+  }
+  if(overlayCountdown) clearInterval(overlayCountdown);
+  overlayCountdown = setInterval(function(){
+    overlaySeconds--;
+    var m = Math.floor(overlaySeconds/60);
+    var s = overlaySeconds%60;
+    document.getElementById('po-timer').textContent = m+':'+(s<10?'0':'')+s;
+    if(overlaySeconds <= 0){
+      clearInterval(overlayCountdown);
+      btn.style.opacity = '1'; btn.style.pointerEvents = 'all';
+      sub.textContent = 'Tu peux maintenant fermer cet écran.';
+      document.getElementById('po-timer').textContent = '✓';
+    } else if(overlaySeconds === 240){
+      sub.textContent = 'Encore 4 minutes...';
+    } else if(overlaySeconds === 120){
+      sub.textContent = 'Encore 2 minutes...';
+    } else if(overlaySeconds === 30){
+      btn.style.opacity = '0.5'; btn.style.pointerEvents = 'all';
+      sub.textContent = 'Presque terminé...';
+    }
+  }, 1000);
+}
+
+function closePrayerOverlay(){
+  document.getElementById('prayer-overlay').style.display = 'none';
+  if(overlayCountdown) clearInterval(overlayCountdown);
+}
+
+// Check on app open if a prayer time was missed recently
+function checkMissedPrayer(){
+  var cached = S.load('cached_prayers', null);
+  if(!cached) return;
+  var prayers = ['Fajr','Dhuhr','Asr','Maghrib','Isha'];
+  var now = new Date();
+  prayers.forEach(function(p){
+    var time = cached.timings[p]; if(!time) return;
+    var parts = time.split(':');
+    var pDate = new Date(); pDate.setHours(parseInt(parts[0]),parseInt(parts[1]),0,0);
+    var diff = (now - pDate) / 60000; // minutes ago
+    if(diff >= 0 && diff <= 5){
+      var lastShown = S.load('last_prayer_shown','');
+      if(lastShown !== p + '_' + pDate.toDateString()){
+        S.save('last_prayer_shown', p + '_' + pDate.toDateString());
+        showPrayerOverlay(p);
+      }
+    }
+  });
+}
+
+// ── SW MESSAGE LISTENER ──────────────────────────────────────
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.addEventListener('message', function(e){
+    if(e.data && e.data.type === 'prayer_overlay'){
+      showPrayerOverlay(e.data.prayer || 'Prière');
+    }
+  });
+}
+
+// Send prayer data to SW + register periodic check
+function sendPrayersToSW(timings){
+  if(!('serviceWorker' in navigator) || !navigator.serviceWorker.controller) return;
+  navigator.serviceWorker.controller.postMessage({type:'SCHEDULE_PRAYERS', prayers: timings});
+  // Register periodic sync if supported
+  navigator.serviceWorker.ready.then(function(reg){
+    if('periodicSync' in reg){
+      reg.periodicSync.register('prayer-check', {minInterval: 60*1000}).catch(function(){});
+    }
+    // Fallback: check every minute via sync
+    setInterval(function(){
+      if(navigator.serviceWorker.controller){
+        navigator.serviceWorker.controller.postMessage({type:'CHECK_PRAYERS'});
+      }
+    }, 60000);
+  });
+}
+function toggleAccord(id){
+  var body = document.getElementById('accord-'+id);
+  var arr = document.getElementById('arr-'+id);
+  var hd = arr.closest('.accord-hd');
+  var isOpen = body.classList.contains('open');
+  body.classList.toggle('open', !isOpen);
+  arr.classList.toggle('open', !isOpen);
+  hd.classList.toggle('open', !isOpen);
+}
+function renderLearn(){
+  learnData = S.load('learn_checks', {});
+  var done = 0;
+  // Render all items
+  document.querySelectorAll('.learn-item').forEach(function(item){
+    var key = item.dataset.key;
+    var checked = !!learnData[key];
+    if(checked){ item.classList.add('done'); done++; }
+    else { item.classList.remove('done'); }
+  });
+  // Progress
+  var pct = Math.round((done / LEARN_TOTAL) * 100);
+  var bar = document.getElementById('learn-bar');
+  var pctEl = document.getElementById('learn-pct');
+  var countEl = document.getElementById('learn-count');
+  if(bar) bar.style.width = pct + '%';
+  if(pctEl) pctEl.textContent = pct + '%';
+  if(countEl) countEl.textContent = done + ' / ' + LEARN_TOTAL + ' éléments complétés';
+  // Sub-counters
+  var juzzDone = Object.keys(learnData).filter(function(k){ return k.startsWith('juzz-') && learnData[k]; }).length;
+  var ibnDone = Object.keys(learnData).filter(function(k){ return k.startsWith('ibn-') && learnData[k]; }).length;
+  var jc = document.getElementById('juzz-count');
+  var ic = document.getElementById('ibn-count');
+  if(jc) jc.textContent = juzzDone + '/37';
+  if(ic) ic.textContent = ibnDone + '/12';
+}
+renderP();renderCals();renderSupp();loadAllWeights();renderDuaa();renderPhotos();restoreDuaaDraft();renderLearn();checkMissedPrayer();if(typeof Notification!=="undefined"&&Notification.permission==="granted"){var nb=document.getElementById("notif-btn");if(nb){nb.textContent="✅ Rappels activés";nb.style.opacity="0.6";}}(function(){var el=document.getElementById("dhikr-count");if(el)el.textContent=S.load("dhikr_count",0);})();
+setTimeout(function(){reqN();setTimeout(doN,1500);},2000);
+</script>
+
+<!-- PRAYER OVERLAY -->
+<div id="prayer-overlay" style="display:none;position:fixed;inset:0;z-index:9999;background:#0d1117;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center">
+  <div style="font-size:60px;margin-bottom:20px">🕌</div>
+  <div style="font-size:28px;font-weight:900;color:var(--gold);margin-bottom:10px" id="po-name">Prière</div>
+  <div style="font-size:16px;color:var(--text);margin-bottom:8px">Il est l'heure de prier</div>
+  <div style="font-size:13px;color:var(--muted);margin-bottom:40px;font-style:italic">« La prière est un pilier de la religion »</div>
+  <div style="width:80px;height:80px;border-radius:50%;border:3px solid var(--gold);display:flex;align-items:center;justify-content:center;margin-bottom:40px">
+    <div id="po-timer" style="font-size:22px;font-weight:900;color:var(--gold)">5:00</div>
+  </div>
+  <button onclick="closePrayerOverlay()" id="po-btn" style="opacity:0;pointer-events:none;background:none;border:1px solid var(--border);color:var(--muted);font-size:13px;padding:12px 28px;border-radius:24px;cursor:pointer;transition:opacity 0.5s">J'ai fait ma prière ✓</button>
+  <div style="font-size:11px;color:var(--muted);margin-top:16px" id="po-sub">Le bouton apparaîtra dans 5 minutes...</div>
+</div>
+</body>
+</html>
