@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
 <meta name="apple-mobile-web-app-title" content="Souhill"/>
-<link rel="manifest" href="./manifest.json"/>
+<link rel="manifest" href="/souhillv/manifest.json"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
 <title>Souhill</title>
 <style>
@@ -632,7 +632,7 @@ window.addEventListener('DOMContentLoaded',function(){
     document.getElementById('splash').classList.add('gone');
   },600);
 });
-if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js').catch(function(){});
+if('serviceWorker' in navigator) navigator.serviceWorker.register('/souhillv/sw.js').catch(function(){});
 function reqN(){if('Notification' in window&&Notification.permission==='default')Notification.requestPermission();}
 function doN(){
   if(Notification.permission!=='granted')return;

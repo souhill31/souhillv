@@ -1,5 +1,5 @@
-const CACHE = 'souhill-v2';
-const ASSETS = ['./', './index.html', './manifest.json', './icons/icon-192.png', './icons/icon-512.png'];
+const CACHE = 'souhill-v3';
+const ASSETS = ['/souhillv/', '/souhillv/index.html', '/souhillv/manifest.json', '/souhillv/icons/icon-192.png', '/souhillv/icons/icon-512.png'];
 
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
@@ -21,23 +21,15 @@ self.addEventListener('notificationclick', e => {
   e.notification.close();
   e.waitUntil(
     clients.matchAll({type:'window', includeUncontrolled:true}).then(function(cls){
-      if(cls.length > 0){
-        cls[0].focus();
-        cls[0].postMessage({type:'prayer_overlay', prayer: e.notification.data && e.notification.data.prayer});
-      } else {
-        clients.openWindow('./');
-      }
+      if(cls.length > 0){ cls[0].focus(); cls[0].postMessage({type:'prayer_overlay', prayer: e.notification.data && e.notification.data.prayer}); }
+      else { clients.openWindow('/souhillv/'); }
     })
   );
 });
 
 self.addEventListener('message', e => {
-  if(e.data && e.data.type === 'SCHEDULE_PRAYERS'){
-    storePrayers(e.data.prayers);
-  }
-  if(e.data && e.data.type === 'CHECK_PRAYERS'){
-    backgroundPrayerCheck();
-  }
+  if(e.data && e.data.type === 'SCHEDULE_PRAYERS') storePrayers(e.data.prayers);
+  if(e.data && e.data.type === 'CHECK_PRAYERS') backgroundPrayerCheck();
 });
 
 self.addEventListener('periodicsync', e => {
@@ -72,8 +64,7 @@ async function checkAndNotify(prayers, lastNotified, nc){
   const now = new Date();
   const todayKey = now.toDateString();
   for(const name of names){
-    const time = prayers[name];
-    if(!time) continue;
+    const time = prayers[name]; if(!time) continue;
     const [h,m] = time.split(':').map(Number);
     const pDate = new Date(); pDate.setHours(h,m,0,0);
     const diffMin = (now - pDate) / 60000;
@@ -83,13 +74,10 @@ async function checkAndNotify(prayers, lastNotified, nc){
       if(nc) await nc.put('last-notified', new Response(key));
       await self.registration.showNotification('🕌 '+name+' — Heure de la prière', {
         body: 'Va faire ta prière avant de retoucher à ton téléphone.',
-        icon: './icons/icon-192.png',
-        badge: './icons/icon-192.png',
-        tag: 'prayer-'+name,
-        renotify: true,
-        requireInteraction: true,
-        vibrate: [300,100,300,100,300],
-        data: {prayer: name}
+        icon: '/souhillv/icons/icon-192.png',
+        badge: '/souhillv/icons/icon-192.png',
+        tag: 'prayer-'+name, renotify: true, requireInteraction: true,
+        vibrate: [300,100,300,100,300], data: {prayer: name}
       });
       const cls = await clients.matchAll({type:'window', includeUncontrolled:true});
       for(const cl of cls) cl.postMessage({type:'prayer_overlay', prayer: name});
